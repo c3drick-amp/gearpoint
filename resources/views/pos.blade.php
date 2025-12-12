@@ -11,8 +11,14 @@
         <div class="card-header">Product Selection</div>
         
         <div class="form-group">
-            <label class="form-label">Search Product</label>
-            <input type="text" id="productSearch" class="form-control" placeholder="Scan barcode or search product name..." autofocus>
+            <label class="form-label">Search Products or Services</label>
+            <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.5rem;">
+                <div style="display:flex; gap:0.25rem;">
+                    <button type="button" id="searchModeProduct" class="btn btn-primary" style="padding: 0.35rem 0.6rem; font-size: 0.85rem;">Products</button>
+                    <button type="button" id="searchModeService" class="btn" style="padding: 0.35rem 0.6rem; font-size: 0.85rem;">Services</button>
+                </div>
+                <input type="text" id="productSearch" class="form-control" placeholder="Scan barcode or search product name..." autofocus style="flex: 1;">
+            </div>
             <span class="form-hint">💡 Tip: Use barcode scanner or type product name/SKU</span>
         </div>
 
@@ -92,6 +98,7 @@
 <script>
 // Cart array to store items
 let cart = [];
+let searchMode = 'product'; // or 'service'
 
 // Product search functionality
 document.getElementById('productSearch').addEventListener('input', function(e) {
@@ -102,8 +109,9 @@ document.getElementById('productSearch').addEventListener('input', function(e) {
         return;
     }
 
-    // Fetch products from server
-    fetch(`/api/products/search?q=${encodeURIComponent(searchTerm)}`)
+    // Fetch products or services from server depending on mode
+    const endpoint = searchMode === 'service' ? '/api/services/search' : '/api/products/search';
+    fetch(`${endpoint}?q=${encodeURIComponent(searchTerm)}`)
         .then(response => response.json())
         .then(products => {
             const resultsDiv = document.getElementById('searchResults');
@@ -113,12 +121,21 @@ document.getElementById('productSearch').addEventListener('input', function(e) {
                 return;
             }
 
-            resultsDiv.innerHTML = products.map(product => `
-                <div style="padding: 0.75rem; border-bottom: 1px solid #eee; cursor: pointer; hover: background: #f8f9fa;" onclick="addToCart(${product.id}, '${product.name.replace(/'/g, "\\'")}', ${product.selling_price}, '${product.sku}')">
-                    <strong>${product.name}</strong> (${product.sku})<br>
-                    <span style="color: #7f8c8d; font-size: 0.9rem;">Stock: ${product.stock} | Price: ₱${parseFloat(product.selling_price).toFixed(2)}</span>
-                </div>
-            `).join('');
+            if (searchMode === 'service') {
+                resultsDiv.innerHTML = products.map(service => `
+                    <div style="padding: 0.75rem; border-bottom: 1px solid #eee; cursor: pointer;" onclick="addToCartService(${service.id}, '${service.name.replace(/'/g, "\\'")}', ${service.labor_fee}, '${service.code}')">
+                        <strong>${service.name}</strong> (${service.code})<br>
+                        <span style="color: #7f8c8d; font-size: 0.9rem;">Fee: ₱${parseFloat(service.labor_fee).toFixed(2)} | Est: ${service.estimated_duration ?? 'N/A'}</span>
+                    </div>
+                `).join('');
+            } else {
+                resultsDiv.innerHTML = products.map(product => `
+                    <div style="padding: 0.75rem; border-bottom: 1px solid #eee; cursor: pointer;" onclick="addToCart(${product.id}, '${product.name.replace(/'/g, "\\'")}', ${product.selling_price}, '${product.sku}')">
+                        <strong>${product.name}</strong> (${product.sku})<br>
+                        <span style="color: #7f8c8d; font-size: 0.9rem;">Stock: ${product.stock} | Price: ₱${parseFloat(product.selling_price).toFixed(2)}</span>
+                    </div>
+                `).join('');
+            }
             
             resultsDiv.style.display = 'block';
         })
@@ -155,6 +172,27 @@ document.getElementById('customerSearch').addEventListener('input', function(e) 
         });
 });
 
+// Search mode toggles
+document.getElementById('searchModeProduct').addEventListener('click', function() {
+    searchMode = 'product';
+    this.classList.add('btn-primary');
+    this.classList.remove('btn');
+    document.getElementById('searchModeService').classList.remove('btn-primary');
+    document.getElementById('searchModeService').classList.add('btn');
+    document.getElementById('productSearch').placeholder = 'Scan barcode or search product name...';
+    document.getElementById('productSearch').focus();
+});
+
+document.getElementById('searchModeService').addEventListener('click', function() {
+    searchMode = 'service';
+    this.classList.add('btn-primary');
+    this.classList.remove('btn');
+    document.getElementById('searchModeProduct').classList.remove('btn-primary');
+    document.getElementById('searchModeProduct').classList.add('btn');
+    document.getElementById('productSearch').placeholder = 'Search services by name or code...';
+    document.getElementById('productSearch').focus();
+});
+
 function selectCustomer(id, name) {
     document.getElementById('customerId').value = id;
     document.getElementById('customerSearch').value = name;
@@ -162,13 +200,15 @@ function selectCustomer(id, name) {
 }
 
 function addToCart(productId, productName, price, sku) {
-    // Check if product already in cart
-    const existingItem = cart.find(item => item.id === productId);
-    
+    // Add product item to cart
+    const cartId = 'p_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    const existingItem = cart.find(item => item.type === 'product' && item.id === productId);
     if (existingItem) {
         existingItem.quantity++;
     } else {
         cart.push({
+            cartId: cartId,
+            type: 'product',
             id: productId,
             name: productName,
             price: parseFloat(price),
@@ -182,13 +222,33 @@ function addToCart(productId, productName, price, sku) {
     document.getElementById('searchResults').style.display = 'none';
 }
 
-function removeFromCart(productId) {
-    cart = cart.filter(item => item.id !== productId);
+function addToCartService(serviceId, serviceName, price, code) {
+    const cartId = 's_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    const existingItem = cart.find(item => item.type === 'service' && item.service_id === serviceId);
+    if (existingItem) {
+        existingItem.quantity++;
+    } else {
+        cart.push({
+            cartId: cartId,
+            type: 'service',
+            service_id: serviceId,
+            name: serviceName,
+            price: parseFloat(price),
+            quantity: 1,
+            code: code
+        });
+    }
     updateCart();
+    document.getElementById('productSearch').value = '';
+    document.getElementById('searchResults').style.display = 'none';
 }
 
-function updateQuantity(productId, newQuantity) {
-    const item = cart.find(item => item.id === productId);
+function removeFromCart(cartId) {
+    cart = cart.filter(item => item.cartId !== cartId);
+    updateCart();
+}
+function updateQuantity(cartId, newQuantity) {
+    const item = cart.find(item => item.cartId === cartId);
     if (item && newQuantity > 0) {
         item.quantity = parseInt(newQuantity);
         updateCart();
@@ -205,13 +265,15 @@ function updateCart() {
     } else {
         cartItemsBody.innerHTML = cart.map(item => {
             const subtotal = item.price * item.quantity;
+            const codeOrSku = item.type === 'product' ? item.sku : (item.code || 'SERV');
+            const typeBadge = item.type === 'service' ? '<small style="color:#fff; background:#3498db; padding:0.15rem 0.25rem; border-radius:4px; font-size:0.75rem;">Service</small>' : '';
             return `
                 <tr>
-                    <td><strong>${item.name}</strong><br><small style="color: #7f8c8d;">${item.sku}</small></td>
+                    <td><strong>${item.name} ${typeBadge}</strong><br><small style="color: #7f8c8d;">${codeOrSku}</small></td>
                     <td>₱${item.price.toFixed(2)}</td>
-                    <td><input type="number" value="${item.quantity}" min="1" style="width: 60px; padding: 0.25rem;" onchange="updateQuantity(${item.id}, this.value)"></td>
+                    <td><input type="number" value="${item.quantity}" min="1" style="width: 60px; padding: 0.25rem;" onchange="updateQuantity('${item.cartId}', this.value)"></td>
                     <td><strong>₱${subtotal.toFixed(2)}</strong></td>
-                    <td><button type="button" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;" onclick="removeFromCart(${item.id})">Remove</button></td>
+                    <td><button type="button" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;" onclick="removeFromCart('${item.cartId}')">Remove</button></td>
                 </tr>
             `;
         }).join('');
@@ -264,11 +326,27 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
         return;
     }
     
+    const itemsPayload = cart.map(item => {
+        if (item.type === 'service') {
+            return {
+                service_id: item.service_id,
+                code: item.code || null,
+                quantity: item.quantity,
+                price: item.price
+            };
+        }
+        return {
+            id: item.id,
+            quantity: item.quantity,
+            price: item.price
+        };
+    });
+
     const saleData = {
         customer_id: document.getElementById('customerId').value || null,
         payment_method: document.getElementById('paymentMethod').value,
         amount_paid: received,
-        items: cart
+        items: itemsPayload
     };
     
     // Submit sale to server

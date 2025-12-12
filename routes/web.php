@@ -80,6 +80,14 @@ Route::get('/api/customers/search', function(\Illuminate\Http\Request $request) 
     return response()->json($customers);
 });
 
+Route::get('/api/services/search', function(\Illuminate\Http\Request $request) {
+    $services = \App\Models\Service::where('name', 'like', '%' . $request->q . '%')
+        ->orWhere('code', 'like', '%' . $request->q . '%')
+        ->limit(10)
+        ->get();
+    return response()->json($services);
+});
+
 Route::post('/api/sales', function(\Illuminate\Http\Request $request) {
     try {
         \DB::beginTransaction();
@@ -101,27 +109,68 @@ Route::post('/api/sales', function(\Illuminate\Http\Request $request) {
         ]);
         
         foreach ($request->items as $item) {
-            \App\Models\SaleItem::create([
-                'sale_id' => $sale->id,
-                'product_id' => $item['id'],
-                'quantity' => $item['quantity'],
-                'price' => $item['price'],
-                'subtotal' => $item['price'] * $item['quantity'],
-            ]);
-            
-            // Update stock
-            $product = \App\Models\Product::find($item['id']);
-            $product->stock -= $item['quantity'];
-            $product->save();
-            
-            // Log inventory
-            \App\Models\InventoryLog::create([
-                'product_id' => $item['id'],
-                'change' => -$item['quantity'],
-                'type' => 'sale',
-                'reference_id' => $sale->id,
-                'reference_type' => 'Sale',
-            ]);
+            // Basic validation: ensure items include either product id or service id
+            if (isset($item['service_id'])) {
+                // If service_id is empty or invalid, try to resolve by code if provided
+                if (empty($item['service_id']) || !is_numeric($item['service_id']) || !\App\Models\Service::find($item['service_id'])) {
+                    if (!empty($item['code'])) {
+                        $service = \App\Models\Service::where('code', $item['code'])->first();
+                        if ($service) {
+                            $item['service_id'] = $service->id;
+                        }
+                    }
+                }
+                if (empty($item['service_id']) || !is_numeric($item['service_id']) || !\App\Models\Service::find($item['service_id'])) {
+                    throw new \Exception('Invalid or missing service_id for one of the items');
+                }
+            } else {
+                if (empty($item['id']) || !is_numeric($item['id']) || !\App\Models\Product::find($item['id'])) {
+                    throw new \Exception('Invalid or missing product id for one of the items');
+                }
+            }
+            // If item is a service, it will have service_id
+            if (isset($item['service_id'])) {
+                \App\Models\SaleItem::create([
+                    'sale_id' => $sale->id,
+                    'product_id' => null,
+                    'service_id' => $item['service_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'subtotal' => $item['price'] * $item['quantity'],
+                ]);
+
+                // No stock update or inventory log for services
+            } else {
+                // Ensure product exists and has enough stock
+                $product = \App\Models\Product::find($item['id']);
+                if (!$product) {
+                    throw new \Exception('Product not found: ' . ($item['id'] ?? 'unknown'));
+                }
+                if ($product->stock < $item['quantity']) {
+                    throw new \Exception('Insufficient stock for product: ' . $product->name);
+                }
+                \App\Models\SaleItem::create([
+                    'sale_id' => $sale->id,
+                    'product_id' => $item['id'],
+                    'service_id' => null,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'subtotal' => $item['price'] * $item['quantity'],
+                ]);
+                
+                // Update stock
+                $product->stock -= $item['quantity'];
+                $product->save();
+                
+                // Log inventory
+                \App\Models\InventoryLog::create([
+                    'product_id' => $item['id'],
+                    'change' => -$item['quantity'],
+                    'type' => 'sale',
+                    'reference_id' => $sale->id,
+                    'reference_type' => 'Sale',
+                ]);
+            }
         }
         
         \DB::commit();

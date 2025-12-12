@@ -227,16 +227,67 @@
             font-size: 0.9rem;
             opacity: 0.9;
         }
+
+        /* Compact pagination styles for custom UI */
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .pagination .page-item {
+            margin: 0;
+        }
+
+        .pagination .page-link {
+            display: inline-block;
+            padding: 0.35rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            background: #ffffff;
+            color: #2c3e50;
+            text-decoration: none;
+            font-size: 0.85rem;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .pagination .page-link:hover {
+            background: #f0f0f0;
+            color: #2c3e50;
+        }
+
+        .pagination .active .page-link, .pagination .page-link[aria-current="page"] {
+            background: #3498db;
+            color: #fff;
+            border-color: #3498db;
+        }
+
+        .pagination .disabled .page-link {
+            color: #bdbdbd;
+            pointer-events: none;
+            background: #fff;
+        }
+
+        /* very small pagination variant */
+        .pagination-sm .page-link {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            min-width: 26px;
+        }
     </style>
 </head>
 <body>
     <!-- Top Navigation -->
     <div class="top-nav">
-        <h1>🏍️ Motorshop POS System</h1>
+        <h1>GEARPOINT</h1>
         <div class="user-info">
-            <span>👤 Admin User</span>
+            <span>Admin User</span>
             <span>|</span>
-            <span>📅 {{ date('M d, Y') }}</span>
+            <span>{{ date('M d, Y') }}</span>
         </div>
     </div>
 
@@ -244,25 +295,25 @@
         <!-- Sidebar Navigation -->
         <div class="sidebar">
             <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                📊 Dashboard
+                Dashboard
             </a>
             <a href="{{ route('pos') }}" class="nav-item {{ request()->routeIs('pos') ? 'active' : '' }}">
-                🛒 Point of Sale
+                Point of Sale
             </a>
             <a href="{{ route('inventory') }}" class="nav-item {{ request()->routeIs('inventory') ? 'active' : '' }}">
-                📦 Inventory
+                Inventory
             </a>
             <a href="{{ route('customers') }}" class="nav-item {{ request()->routeIs('customers') ? 'active' : '' }}">
-                👥 Customers
+                Customers
             </a>
             <a href="{{ route('suppliers') }}" class="nav-item {{ request()->routeIs('suppliers') ? 'active' : '' }}">
-                🏢 Suppliers
+                Suppliers
             </a>
             <a href="{{ route('services') }}" class="nav-item {{ request()->routeIs('services') ? 'active' : '' }}">
-                🔧 Services
+                Services
             </a>
             <a href="{{ route('reports') }}" class="nav-item {{ request()->routeIs('reports') ? 'active' : '' }}">
-                📈 Reports
+                Reports
             </a>
         </div>
 

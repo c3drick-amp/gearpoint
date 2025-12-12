@@ -105,8 +105,13 @@
         <div style="color: #7f8c8d; font-size: 0.9rem;">
             Showing {{ $products->firstItem() }} to {{ $products->lastItem() }} of {{ $products->total() }} products
         </div>
-        <div>
-            {{ $products->appends(request()->query())->links() }}
+        <div style="display:flex; gap: 1rem; align-items: center;">
+            <div style="color: #7f8c8d; font-size: 0.9rem;">
+                Page {{ $products->currentPage() }} of {{ $products->lastPage() }}
+            </div>
+            <div>
+                {{ $products->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-4') }}
+            </div>
         </div>
     </div>
     @else

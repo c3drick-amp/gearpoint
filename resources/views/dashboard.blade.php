@@ -52,7 +52,7 @@
         </tbody>
     </table>
     @else
-    <p style="text-align: center; color: #7f8c8d; padding: 1rem;">All products are well stocked! ✅</p>
+    <p style="text-align: center; color: #7f8c8d; padding: 1rem;">All products are well stocked!</p>
     @endif
 </div>
 

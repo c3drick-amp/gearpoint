@@ -32,12 +32,12 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Item</th>
-                        <th>Type</th>
-                        <th>Code/SKU</th>
-                        <th>Qty</th>
-                        <th>Price</th>
-                        <th>Subtotal</th>
+                        <th class="sortable" data-type="string">Item</th>
+                        <th class="sortable" data-type="string">Type</th>
+                        <th class="sortable" data-type="string">Code/SKU</th>
+                        <th class="sortable" data-type="number">Qty</th>
+                        <th class="sortable" data-type="number">Price</th>
+                        <th class="sortable" data-type="number">Subtotal</th>
                     </tr>
                 </thead>
                 <tbody>

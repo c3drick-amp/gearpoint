@@ -74,12 +74,12 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Transaction ID</th>
-                    <th>Date</th>
-                    <th>Customer</th>
-                    <th>Items</th>
-                    <th>Amount</th>
-                    <th>Payment Method</th>
+                    <th class="sortable" data-type="number">Transaction ID</th>
+                    <th class="sortable" data-type="date">Date</th>
+                    <th class="sortable" data-type="string">Customer</th>
+                    <th class="sortable" data-type="number">Items</th>
+                    <th class="sortable" data-type="number">Amount</th>
+                    <th class="sortable" data-type="string">Payment Method</th>
                 </tr>
             </thead>
             <tbody>
@@ -113,13 +113,13 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>SKU</th>
-                    <th>Product Name</th>
-                    <th>Category</th>
-                    <th>Current Stock</th>
-                    <th>Cost Price</th>
-                    <th>Selling Price</th>
-                    <th>Stock Value</th>
+                    <th class="sortable" data-type="string">SKU</th>
+                    <th class="sortable" data-type="string">Product Name</th>
+                    <th class="sortable" data-type="string">Category</th>
+                    <th class="sortable" data-type="number">Current Stock</th>
+                    <th class="sortable" data-type="number">Cost Price</th>
+                    <th class="sortable" data-type="number">Selling Price</th>
+                    <th class="sortable" data-type="number">Stock Value</th>
                 </tr>
             </thead>
             <tbody>
@@ -161,11 +161,11 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Customer Name</th>
-                    <th>Phone</th>
-                    <th>Total Purchases</th>
-                    <th>Total Spent</th>
-                    <th>Last Purchase</th>
+                    <th class="sortable" data-type="string">Customer Name</th>
+                    <th class="sortable" data-type="string">Phone</th>
+                    <th class="sortable" data-type="number">Total Purchases</th>
+                    <th class="sortable" data-type="number">Total Spent</th>
+                    <th class="sortable" data-type="date">Last Purchase</th>
                 </tr>
             </thead>
             <tbody>
@@ -233,7 +233,7 @@ function buildSalesHtml(data, periodLabel) {
     html += `</div>`;
 
     if (data.sales && data.sales.length > 0) {
-        html += `<table class=\"table\"><thead><tr><th>Transaction ID</th><th>Date</th><th>Customer</th><th>Items</th><th>Amount</th><th>Payment Method</th></tr></thead><tbody>`;
+        html += `<table class=\"table\"><thead><tr><th class=\"sortable\" data-type=\"number\">Transaction ID</th><th class=\"sortable\" data-type=\"date\">Date</th><th class=\"sortable\" data-type=\"string\">Customer</th><th class=\"sortable\" data-type=\"number\">Items</th><th class=\"sortable\" data-type=\"number\">Amount</th><th class=\"sortable\" data-type=\"string\">Payment Method</th></tr></thead><tbody>`;
         data.sales.forEach(s => {
             html += `<tr><td>#${String(s.id).padStart(6,'0')}</td><td>${s.created_at}</td><td>${s.customer}</td><td>${s.items}</td><td>₱${Number(s.total_amount).toFixed(2)}</td><td>${s.payment_method}</td></tr>`;
         });
@@ -248,7 +248,7 @@ function buildInventoryHtml(data, periodLabel) {
     let html = '';
     html += `<div class="card-header">Inventory Report (${periodLabel})</div>`;
     if (data.products && data.products.length > 0) {
-        html += `<table class=\"table\"><thead><tr><th>SKU</th><th>Product Name</th><th>Category</th><th>Current Stock</th><th>Cost Price</th><th>Selling Price</th><th>Stock Value</th></tr></thead><tbody>`;
+        html += `<table class=\"table\"><thead><tr><th class=\"sortable\" data-type=\"string\">SKU</th><th class=\"sortable\" data-type=\"string\">Product Name</th><th class=\"sortable\" data-type=\"string\">Category</th><th class=\"sortable\" data-type=\"number\">Current Stock</th><th class=\"sortable\" data-type=\"number\">Cost Price</th><th class=\"sortable\" data-type=\"number\">Selling Price</th><th class=\"sortable\" data-type=\"number\">Stock Value</th></tr></thead><tbody>`;
         data.products.forEach(p => {
             const rowStyle = (p.stock <= p.reorder_level) ? 'background: #fff3cd;' : '';
             html += `<tr style=\"${rowStyle}\"><td>${p.sku}</td><td>${p.name}</td><td>${p.category||''}</td><td>${p.stock}</td><td>₱${Number(p.cost_price).toFixed(2)}</td><td>₱${Number(p.selling_price).toFixed(2)}</td><td>₱${(p.stock * p.cost_price).toFixed(2)}</td></tr>`;
@@ -265,7 +265,7 @@ function buildCustomersHtml(data, periodLabel) {
     let html = '';
     html += `<div class=\"card-header\">Customer Report (${periodLabel})</div>`;
     if (data.customers && data.customers.length > 0) {
-        html += `<table class=\"table\"><thead><tr><th>Customer Name</th><th>Phone</th><th>Total Purchases</th><th>Total Spent</th><th>Last Purchase</th></tr></thead><tbody>`;
+        html += `<table class=\"table\"><thead><tr><th class=\"sortable\" data-type=\"string\">Customer Name</th><th class=\"sortable\" data-type=\"string\">Phone</th><th class=\"sortable\" data-type=\"number\">Total Purchases</th><th class=\"sortable\" data-type=\"number\">Total Spent</th><th class=\"sortable\" data-type=\"date\">Last Purchase</th></tr></thead><tbody>`;
         data.customers.forEach(c => {
             html += `<tr><td>${c.first_name} ${c.last_name}</td><td>${c.phone}</td><td>${c.sales_count}</td><td>₱${Number(c.total_spent).toFixed(2)}</td><td>${c.last_purchase||'N/A'}</td></tr>`;
         });
@@ -312,6 +312,7 @@ async function fetchReport() {
         else if (type === 'customers') content = buildCustomersHtml(data, periodLabel);
         else if (type === 'services') content = buildServicesHtml(data, periodLabel);
         reportCard.innerHTML = content;
+        if (typeof initTableSorters === 'function') initTableSorters();
 
         // Update PDF link
         const pdfBtn = document.getElementById('downloadPdf');

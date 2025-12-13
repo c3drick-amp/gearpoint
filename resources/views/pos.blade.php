@@ -5,9 +5,9 @@
 @section('content')
 <h2 style="margin-bottom: 1.5rem;">Point of Sale</h2>
 
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; height: calc(100vh - 160px); overflow: hidden;">
     <!-- Left Side: Product Selection -->
-    <div class="card">
+    <div class="card" style="display:flex; flex-direction:column; overflow:hidden;">
         <div class="card-header">Product Selection</div>
         
         <div class="form-group">
@@ -22,12 +22,12 @@
         </div>
 
         <!-- Product Search Results -->
-        <div id="searchResults" style="display: none; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 1rem;">
+        <div id="searchResults" style="display: none; max-height: 28vh; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 1rem;">
             <!-- Results will be populated here -->
         </div>
 
         <!-- Cart Items -->
-        <div style="margin-top: 1rem;">
+        <div style="margin-top: 1rem; overflow-y:auto;">
             <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Cart Items</h3>
             <table class="table">
                 <thead>
@@ -49,7 +49,7 @@
     </div>
 
     <!-- Right Side: Payment -->
-    <div class="card">
+    <div class="card" style="display:flex; flex-direction:column; overflow:hidden;">
         <div class="card-header">Payment</div>
         
         <div style="background: #ecf0f1; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
@@ -57,7 +57,7 @@
             <div id="totalAmount" style="font-size: 2rem; font-weight: bold; color: #2c3e50;">₱0.00</div>
         </div>
 
-        <form id="checkoutForm">
+        <form id="checkoutForm" style="display:flex; flex-direction:column; gap:0.5rem;">
             <div class="form-group">
                 <label class="form-label">Customer (Optional)</label>
                 <input type="text" id="customerSearch" class="form-control" placeholder="Search customer name or phone...">

@@ -39,7 +39,7 @@
 
         .container {
             display: flex;
-            height: calc(100vh - 60px);
+            min-height: calc(100vh - 60px);
         }
 
         .sidebar {
@@ -73,17 +73,34 @@
 
         .main-content {
             flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
+            padding: 0.75rem;
+            overflow: hidden; /* children will scroll individually */
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
 
         .card {
             background: white;
             border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
         }
+        /* Make card bodies scrollable to keep tabs fit to screen */
+        .card .card-body, .card > div:not(.card-header) {
+            overflow: auto;
+            max-height: calc(100vh - 180px);
+        }
+
+        /* Remove underlines for most links and keep clear hover state */
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        a:hover { color: #3498db; text-decoration: underline; }
 
         .card-header {
             font-size: 1.3rem;
@@ -206,15 +223,15 @@
         }
 
         .stat-card.green {
-            background: #0097d8ff; /* solid pink */
+            background: #0097d8ff; 
         }
 
         .stat-card.blue {
-            background: #4facfe; /* solid blue */
+            background: #4facfe; 
         }
 
         .stat-card.orange {
-            background: #d40000ff; /* solid coral */
+            background: #d40000ff; 
         }
 
         .stat-value {
@@ -278,6 +295,30 @@
             font-size: 0.8rem;
             min-width: 26px;
         }
+
+        /* Sortable table header styles */
+        th.sortable {
+            position: relative;
+            padding-right: 2.25rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        th.sortable .sort-icon {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: inline-flex;
+            flex-direction: column;
+            gap: 0.08rem;
+            font-size: 0.65rem;
+            color: #7f8c8d;
+            line-height: 0.75rem;
+            text-align: center;
+        }
+        th.sortable .sort-icon .up, th.sortable .sort-icon .down { opacity: 0.35; }
+        th.sortable.asc .sort-icon .up { opacity: 1; color: #3498db; }
+        th.sortable.desc .sort-icon .down { opacity: 1; color: #e67e22; }
     </style>
 </head>
 <body>
@@ -319,9 +360,11 @@
             <a href="{{ route('customers') }}" class="nav-item {{ request()->routeIs('customers') ? 'active' : '' }}">
                 Customers
             </a>
+            @if(auth()->user() && (auth()->user()->isAdmin() || auth()->user()->isManager()))
             <a href="{{ route('transactions') }}" class="nav-item {{ request()->routeIs('transactions*') ? 'active' : '' }}">
                 Transactions
             </a>
+            @endif
             <a href="{{ route('suppliers') }}" class="nav-item {{ request()->routeIs('suppliers') ? 'active' : '' }}">
                 Suppliers
             </a>
@@ -349,4 +392,66 @@
         <div style="padding: 2rem;">@yield('content')</div>
     @endif
 </body>
+<script>
+function initTableSorters() {
+    function parseValue(type, val) {
+        if (type === 'number') return parseFloat(val.replace(/[^0-9.-]+/g, '')) || 0;
+        if (type === 'date') return Date.parse(val) || 0;
+        if (type === 'string') return val.trim().toLowerCase();
+        // default: try to guess number
+        const num = parseFloat(val.replace(/[^0-9.-]+/g, ''));
+        if (!isNaN(num)) return num;
+        return val.trim().toLowerCase();
+    }
+
+    function getTypeFromHeader(th) {
+        const t = th.getAttribute('data-type');
+        if (t) return t;
+        return 'string';
+    }
+
+    function createSortIcon() {
+        const span = document.createElement('span');
+        span.className = 'sort-icon';
+        const up = document.createElement('span'); up.className = 'up'; up.textContent = '▲';
+        const down = document.createElement('span'); down.className = 'down'; down.textContent = '▼';
+        span.appendChild(up);
+        span.appendChild(down);
+        return span;
+    }
+
+    document.querySelectorAll('table').forEach(table => {
+        const headers = table.querySelectorAll('th');
+        headers.forEach((th, idx) => {
+            if (th.classList.contains('sortable')) {
+                // add icon if not present
+                if (!th.querySelector('.sort-icon')) th.appendChild(createSortIcon());
+                th.setAttribute('title','Click to sort');
+                th.addEventListener('click', () => {
+                    const type = getTypeFromHeader(th);
+                    const tbody = table.querySelector('tbody');
+                    if (!tbody) return;
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+                    const currentDir = th.classList.contains('asc') ? 'asc' : (th.classList.contains('desc') ? 'desc' : null);
+                    // reset other headers' classes
+                    headers.forEach(h => h.classList.remove('asc', 'desc'));
+                    const dir = currentDir === 'asc' ? 'desc' : 'asc';
+                    th.classList.add(dir);
+                    rows.sort((a, b) => {
+                        const aVal = parseValue(type, (a.cells[idx] ? a.cells[idx].textContent : '').trim());
+                        const bVal = parseValue(type, (b.cells[idx] ? b.cells[idx].textContent : '').trim());
+                        if (typeof aVal === 'number' && typeof bVal === 'number') return dir === 'asc' ? aVal - bVal : bVal - aVal;
+                        if (aVal < bVal) return dir === 'asc' ? -1 : 1;
+                        if (aVal > bVal) return dir === 'asc' ? 1 : -1;
+                        return 0;
+                    });
+                    // reattach rows
+                    rows.forEach(r => tbody.appendChild(r));
+                });
+            }
+        });
+    });
+}
+document.addEventListener('DOMContentLoaded', function () { initTableSorters(); });
+</script>
 </html>

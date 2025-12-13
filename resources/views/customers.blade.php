@@ -33,12 +33,12 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Contact Number</th>
-                    <th>Email</th>
-                    <th>Vehicle</th>
-                    <th>Registered</th>
+                    <th class="sortable" data-type="number">ID</th>
+                    <th class="sortable" data-type="string">Name</th>
+                    <th class="sortable" data-type="string">Contact Number</th>
+                    <th class="sortable" data-type="string">Email</th>
+                    <th class="sortable" data-type="string">Vehicle</th>
+                    <th class="sortable" data-type="date">Registered</th>
                     <th style="text-align: center;">Actions</th>
                 </tr>
             </thead>

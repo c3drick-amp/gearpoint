@@ -18,12 +18,12 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Date</th>
-                    <th>Customer</th>
-                    <th>Cashier</th>
-                    <th>Total</th>
-                    <th>Payment</th>
+                    <th class="sortable" data-type="number">ID</th>
+                    <th class="sortable" data-type="date">Date</th>
+                    <th class="sortable" data-type="string">Customer</th>
+                    <th class="sortable" data-type="string">Cashier</th>
+                    <th class="sortable" data-type="number">Total</th>
+                    <th class="sortable" data-type="string">Payment</th>
                     <th></th>
                 </tr>
             </thead>

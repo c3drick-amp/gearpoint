@@ -30,10 +30,10 @@
     <table class="table">
         <thead>
             <tr>
-                <th>SKU</th>
-                <th>Product Name</th>
-                <th>Current Stock</th>
-                <th>Reorder Level</th>
+                <th class="sortable" data-type="string">SKU</th>
+                <th class="sortable" data-type="string">Product Name</th>
+                <th class="sortable" data-type="number">Current Stock</th>
+                <th class="sortable" data-type="number">Reorder Level</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -62,12 +62,12 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Transaction ID</th>
-                <th>Customer</th>
-                <th>Cashier</th>
-                <th>Amount</th>
-                <th>Payment Method</th>
-                <th>Date</th>
+                <th class="sortable" data-type="number">Transaction ID</th>
+                <th class="sortable" data-type="string">Customer</th>
+                <th class="sortable" data-type="string">Cashier</th>
+                <th class="sortable" data-type="number">Amount</th>
+                <th class="sortable" data-type="string">Payment Method</th>
+                <th class="sortable" data-type="date">Date</th>
             </tr>
         </thead>
         <tbody>

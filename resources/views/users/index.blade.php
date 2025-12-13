@@ -22,9 +22,9 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
+                        <th class="sortable" data-type="string">Name</th>
+                        <th class="sortable" data-type="string">Email</th>
+                        <th class="sortable" data-type="string">Role</th>
                         <th>Actions</th>
                     </tr>
                 </thead>

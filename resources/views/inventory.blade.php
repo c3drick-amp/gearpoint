@@ -56,13 +56,13 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>SKU</th>
-                    <th>Product Name</th>
-                    <th>Category</th>
-                    <th>Brand</th>
-                    <th style="text-align: center;">Stock</th>
-                    <th style="text-align: right;">Cost Price</th>
-                    <th style="text-align: right;">Selling Price</th>
+                    <th class="sortable" data-type="string">SKU</th>
+                    <th class="sortable" data-type="string">Product Name</th>
+                    <th class="sortable" data-type="string">Category</th>
+                    <th class="sortable" data-type="string">Brand</th>
+                    <th class="sortable" data-type="number" style="text-align: center;">Stock</th>
+                    <th class="sortable" data-type="number" style="text-align: right;">Cost Price</th>
+                    <th class="sortable" data-type="number" style="text-align: right;">Selling Price</th>
                     <th style="text-align: center;">Actions</th>
                 </tr>
             </thead>

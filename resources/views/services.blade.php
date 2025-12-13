@@ -49,11 +49,11 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Code</th>
-                    <th>Service Name</th>
-                    <th>Category</th>
-                    <th style="text-align: right;">Labor Fee</th>
-                    <th>Est. Duration</th>
+                    <th class="sortable" data-type="string">Code</th>
+                    <th class="sortable" data-type="string">Service Name</th>
+                    <th class="sortable" data-type="string">Category</th>
+                    <th class="sortable" data-type="number" style="text-align: right;">Labor Fee</th>
+                    <th class="sortable" data-type="string">Est. Duration</th>
                     <th style="text-align: center;">Actions</th>
                 </tr>
             </thead>

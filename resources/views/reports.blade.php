@@ -47,7 +47,6 @@
             </div>
         </div>
 
-        <button type="button" id="downloadPdf" class="btn btn-secondary" style="margin-right: 0.5rem;">Download PDF</button>
         <button type="button" class="btn btn-success" id="openPrintBtn">Print Report</button>
     </form>
 </div>

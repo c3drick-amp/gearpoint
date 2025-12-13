@@ -18,6 +18,12 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middl
 Route::post('/login', [AuthController::class, 'login'])->name('login.post')->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
+// Forgot/Reset password
+Route::get('/password/forgot', [AuthController::class, 'showForgot'])->name('password.request')->middleware('guest');
+Route::post('/password/email', [AuthController::class, 'sendForgot'])->name('password.email')->middleware('guest');
+Route::get('/password/reset/{token}', [AuthController::class, 'showResetForm'])->name('password.reset')->middleware('guest');
+Route::post('/password/reset', [AuthController::class, 'reset'])->name('password.update')->middleware('guest');
+
 // Dashboard
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

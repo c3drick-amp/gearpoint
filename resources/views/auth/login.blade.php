@@ -6,22 +6,27 @@
     <div style="max-width: 420px; margin: 2rem auto;">
         <div class="card">
             <div class="card-header">Login</div>
+            <div style="padding: .5rem 1rem; font-size: .9rem; color: #555;">Login with your <strong>username</strong> (no spaces).</div>
             <div class="card-body">
-                @if ($errors->any())
+                @if ($errors->has('name'))
+                    <div style="margin-bottom: 1rem; color: red;">{{ $errors->first('name') }}</div>
+                @elseif ($errors->has('password'))
+                    <div style="margin-bottom: 1rem; color: red;">{{ $errors->first('password') }}</div>
+                @elseif ($errors->any())
                     <div style="margin-bottom: 1rem; color: red;">{{ $errors->first() }}</div>
                 @endif
                 <form method="POST" action="{{ route('login.post') }}">
                     @csrf
                     <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control" value="{{ old('email') }}" required autofocus>
+                        <label class="form-label">Name</label>
+                        <input type="text" name="name" pattern="^[A-Za-z0-9_]+$" title="No spaces. Use letters, numbers, and underscores only (e.g., AdminUser)." class="form-control" value="{{ old('name') }}" oninput="this.value=this.value.replace(/\s/g,'')" autocomplete="username" autocapitalize="off" autocorrect="off" required autofocus>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" required>
+                        <input type="password" name="password" class="form-control" autocomplete="current-password" required>
                     </div>
                     <div class="form-group">
-                        <label><input type="checkbox" name="remember"> Remember me</label>
+                        <a href="{{ route('password.request') }}">Forgot password?</a>
                     </div>
                     <div class="form-group">
                         <button class="btn btn-primary">Login</button>

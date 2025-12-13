@@ -281,6 +281,11 @@
     </style>
 </head>
 <body>
+    @php
+        $isAuthRoute = request()->routeIs('login') || request()->routeIs('password.*');
+    @endphp
+
+    @if (!$isAuthRoute)
     <!-- Top Navigation -->
     <div class="top-nav">
         <h1>GEARPOINT</h1>
@@ -340,5 +345,8 @@
             @yield('content')
         </div>
     </div>
+    @else
+        <div style="padding: 2rem;">@yield('content')</div>
+    @endif
 </body>
 </html>

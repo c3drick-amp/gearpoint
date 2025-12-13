@@ -20,6 +20,7 @@ class Product extends Model
         'reorder_level',
         'unit',
         'description',
+        'expiry_date',
     ];
 
     public function category()

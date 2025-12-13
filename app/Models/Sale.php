@@ -17,6 +17,17 @@ class Sale extends Model
         'amount_paid',
         'change_due',
         'payment_method',
+        'transaction_year',
+        'is_void',
+        'voided_by',
+        'voided_at',
+        'void_reason',
+    ];
+
+    protected $casts = [
+        'is_void' => 'boolean',
+        'voided_at' => 'datetime',
+        'transaction_year' => 'integer',
     ];
 
     public function customer()
@@ -32,5 +43,20 @@ class Sale extends Model
     public function saleItems()
     {
         return $this->hasMany(SaleItem::class);
+    }
+
+    public function voidRequests()
+    {
+        return $this->hasMany(VoidRequest::class);
+    }
+
+    public function voidLogs()
+    {
+        return $this->hasMany(VoidLog::class);
+    }
+
+    public function voidedBy()
+    {
+        return $this->belongsTo(User::class, 'voided_by');
     }
 }

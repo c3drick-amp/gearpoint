@@ -73,8 +73,17 @@ Route::delete('/services/{id}', [ServiceController::class, 'destroy'])->name('se
     return view('transactions.index', compact('sales'));
     })->name('transactions')->middleware('role:admin|manager');
 
+    // Voided Transactions list (Admin and Manager)
+    Route::get('/transactions/voided', function () {
+        $sales = \App\Models\Sale::with(['customer', 'user', 'voidedBy'])
+            ->where('is_void', 1)
+            ->orderBy('voided_at', 'desc')
+            ->paginate(20);
+        return view('transactions.voided', compact('sales'));
+    })->name('transactions.voided')->middleware('role:admin|manager');
+
 Route::get('/transactions/{id}', function ($id) {
-    $sale = \App\Models\Sale::with(['saleItems.product', 'saleItems.service', 'customer', 'user'])->findOrFail($id);
+    $sale = \App\Models\Sale::with(['saleItems.product', 'saleItems.service', 'customer', 'user', 'voidedBy', 'voidRequests', 'voidLogs'])->findOrFail($id);
     return view('transactions.show', compact('sale'));
     })->name('transactions.show')->middleware('role:admin|manager');
 

@@ -198,7 +198,7 @@
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #0ad100ff; /* solid color instead of gradient */
             color: white;
             padding: 1.5rem;
             border-radius: 8px;
@@ -206,15 +206,15 @@
         }
 
         .stat-card.green {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: #0097d8ff; /* solid pink */
         }
 
         .stat-card.blue {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: #4facfe; /* solid blue */
         }
 
         .stat-card.orange {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            background: #d40000ff; /* solid coral */
         }
 
         .stat-value {
